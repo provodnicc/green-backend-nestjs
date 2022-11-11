@@ -34,8 +34,8 @@ export class AuthController {
     @Res({passthrough: true })
     res: Response,
   ){
-    const host = this.authService.getHostInfo(req)
     console.log(signInDto)
+    const host = this.authService.getHostInfo(req)
     const context = await this.authService.signIn(signInDto, host)
     this.authService.setCookie(res, context.refreshToken)
     return context
