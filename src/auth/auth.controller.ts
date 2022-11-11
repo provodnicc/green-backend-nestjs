@@ -18,6 +18,8 @@ export class AuthController {
     @Body()
     signUpDto: SignUpDto
   ){
+    console.log(signUpDto)
+
     return await this.authService.signUp(signUpDto)
   }
 
@@ -33,7 +35,7 @@ export class AuthController {
     res: Response,
   ){
     const host = this.authService.getHostInfo(req)
-
+    console.log(signInDto)
     const context = await this.authService.signIn(signInDto, host)
     this.authService.setCookie(res, context.refreshToken)
     return context
