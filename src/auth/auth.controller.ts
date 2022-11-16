@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { Host } from 'src/interfaces/host.interface';
 import { GetUserDto } from 'src/users/dtos/get-user.dto';
@@ -8,22 +9,23 @@ import { SignInDto } from './dtos/sign-in.dto';
 import { SignUpDto } from './dtos/sign-up.dto';
 import { RefreshGuard } from './guards/rt.guard';
 
-
+@ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {
   }
   @Post('sign-up')
+  @ApiOperation({summary: 'sig-up user'})
   async signUp(
     @Body()
     signUpDto: SignUpDto
   ){
-    console.log(signUpDto)
 
     return await this.authService.signUp(signUpDto)
   }
 
   @Post('sign-in')
+  @ApiOperation({summary: 'sign-in user'})
   async signIn(
     @Req()
     req: Request,
@@ -38,11 +40,12 @@ export class AuthController {
     const host = this.authService.getHostInfo(req)
     const context = await this.authService.signIn(signInDto, host)
     this.authService.setCookie(res, context.refreshToken)
-    return context
+    return context.accessToken
   }
   
   @UseGuards(RefreshGuard)
   @Patch('refresh')
+  @ApiOperation({summary: 'refresh token pair by cookie'})
   async refresh(
     @Req()
     req: Request,
@@ -61,6 +64,7 @@ export class AuthController {
 
   @UseGuards(RefreshGuard)
   @Delete('logout')
+  @ApiOperation({summary: 'remove cookie and session'})
   async logOut(
     @Res({passthrough: true})
     res: Response,
