@@ -20,7 +20,6 @@ export class UserSession{
     @JoinColumn()
     token: Token
 
-    
     @ManyToOne(()=>User, (user)=>user.sessions, { 
         onDelete: "SET NULL",
         onUpdate: "CASCADE"
@@ -29,4 +28,8 @@ export class UserSession{
 
     @Column({default: new Date()})
     createdAt: Date
+
+    @Column({default: new Date()})
+    updatedAt: Date
+
 }
