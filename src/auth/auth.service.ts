@@ -11,6 +11,7 @@ import { User } from 'src/users/entities/user.entity';
 import { UserSession } from 'src/sessions/entities/session.entity';
 import { Host } from 'src/interfaces/host.interface';
 import { Request, Response } from 'express';
+import { Oauth } from './enums/oauth.enum';
 @Injectable()
 export class AuthService {
     constructor(
@@ -18,6 +19,10 @@ export class AuthService {
         private tokenService: TokensService,
         private sessionService: SessionsService
     ){}
+
+    // async Oauth(oauth: Oauth){
+    //     return this.usersService.create(oauth)
+    // }
 
     async signUp(signUpDto: SignUpDto){
         const user = await this.usersService.getUserByEmail(signUpDto.email)
@@ -27,7 +32,6 @@ export class AuthService {
         const newUser = await this.usersService.create(signUpDto)
         if(!newUser){
             throw new HttpException('пользователь не был создан', HttpStatus.INTERNAL_SERVER_ERROR)
-
         }
         const userDto = new GetUserDto(newUser)
         return userDto
@@ -76,7 +80,6 @@ export class AuthService {
 
         await this.tokenService.deleteToken(token)
     }
-    
 
     getHostInfo(req: Request){
         const agent = req.headers['user-agent']
@@ -91,7 +94,8 @@ export class AuthService {
             {
                 maxAge: 1000*60*60,
                 httpOnly:true,
-                secure: process.env.DEBUG? false : true
+                sameSite: 'none',
+                secure: true
             }
         )
         return res

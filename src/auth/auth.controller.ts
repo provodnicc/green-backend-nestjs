@@ -5,6 +5,7 @@ import { Request, Response } from 'express';
 import { Host } from 'src/interfaces/host.interface';
 import { GetUserDto } from 'src/users/dtos/get-user.dto';
 import { AuthService } from './auth.service';
+import { OauthDto } from './dtos/Oauth.dto';
 import { SignInDto } from './dtos/sign-in.dto';
 import { SignUpDto } from './dtos/sign-up.dto';
 import { RefreshGuard } from './guards/rt.guard';
@@ -14,14 +15,23 @@ import { RefreshGuard } from './guards/rt.guard';
 export class AuthController {
   constructor(private readonly authService: AuthService) {
   }
+
   @Post('sign-up')
   @ApiOperation({summary: 'sig-up user'})
   async signUp(
     @Body()
     signUpDto: SignUpDto
   ){
-
     return await this.authService.signUp(signUpDto)
+  }
+
+  @Post('/oauth')
+  @ApiOperation({summary: 'oauth via other services'})
+  async Oauth(
+    @Body()
+    oauthDto: OauthDto
+  ){
+    return oauthDto
   }
 
   @Post('sign-in')
@@ -29,22 +39,22 @@ export class AuthController {
   async signIn(
     @Req()
     req: Request,
-    
+
     @Body()
     signInDto: SignInDto,
 
     @Res({passthrough: true })
     res: Response,
   ){
-    console.log(signInDto)
     const host = this.authService.getHostInfo(req)
     const context = await this.authService.signIn(signInDto, host)
+
     this.authService.setCookie(res, context.refreshToken)
     return context.accessToken
   }
   
   @UseGuards(RefreshGuard)
-  @Patch('refresh')
+  @Get('refresh')
   @ApiOperation({summary: 'refresh token pair by cookie'})
   async refresh(
     @Req()
@@ -73,12 +83,10 @@ export class AuthController {
     req: Request
   ){
     const token = req.cookies['refreshToken']
-
+    
     await this.authService.logout(token)
     res.clearCookie('refreshToken')
   }
-
-  
 
   // @UseGuards(JWTAuthGuard, RolesGuard)
   // @Get('check')

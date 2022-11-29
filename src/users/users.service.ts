@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import * as argon2 from 'argon2'
+import { Oauth } from 'src/auth/enums/oauth.enum';
 @Injectable()
 export class UsersService {
     constructor(
@@ -16,6 +17,10 @@ export class UsersService {
         return await this.userRepository.save(encrypted)
     }
 
+    // async createOauth(oauth: Oauth){
+    //     return await this.userRepository.save()
+    // }
+
     async update(user: User){
         return await this.userRepository.save(user)
     }
@@ -26,6 +31,9 @@ export class UsersService {
     }
 
     async getUserByEmail(email: string){
+        if(!email){
+            return null
+        }
         const user = await this.userRepository.findOneBy({email: email})
         return user
     }
