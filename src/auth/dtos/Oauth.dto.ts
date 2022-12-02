@@ -1,22 +1,18 @@
 import { Oauth } from "../enums/oauth.enum"
-import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator'
+import { IsEmail, IsString } from 'class-validator'
 import { ApiProperty } from "@nestjs/swagger"
 
 
 export class OauthDto{
     
-    @ApiProperty({default: 'yandex@ayndex.ru'})
+    @ApiProperty({default: 'yandex@yandex.ru'})
     @IsEmail()
     email: string
     
     @ApiProperty({default: 'https://avatars.yandex.net/get-yapic/0/0-0/islands-small'})
     @IsString()
-    image: string
+    img: string
 
-    @ApiProperty({default: Oauth.YANDEX})
-    @IsEnum({enum: Oauth})
-    @IsNotEmpty()
-    oauth: Oauth
-
-    token: string
+    // @ApiProperty({default: 'aaa'})
+    // token: string
 }

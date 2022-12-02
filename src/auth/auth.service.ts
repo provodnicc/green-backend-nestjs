@@ -12,6 +12,7 @@ import { UserSession } from 'src/sessions/entities/session.entity';
 import { Host } from 'src/interfaces/host.interface';
 import { Request, Response } from 'express';
 import { Oauth } from './enums/oauth.enum';
+import { OauthDto } from './dtos/Oauth.dto';
 @Injectable()
 export class AuthService {
     constructor(
@@ -20,13 +21,38 @@ export class AuthService {
         private sessionService: SessionsService
     ){}
 
-    // async Oauth(oauth: Oauth){
-    //     return this.usersService.create(oauth)
-    // }
+    async Oauth(oauthUser: OauthDto, oauth: Oauth){
+        const user = new User()
+        user.email = oauthUser.email
+
+        
+        user.img = `https://avatars.yandex.net/get-yapic/${oauthUser.img}/islands-small`
+        
+
+
+        const db_user = await this.usersService.getUserByEmail(user.email)
+        if(db_user){
+            const userDto = new GetUserDto(db_user)
+            const tokens = await this.tokenService.generateTokens({...userDto})
+            const refreshToken = await this.tokenService.saveToken(tokens.refreshToken)
+
+            return refreshToken
+        }
+        const newUser = await this.usersService.createOauth(user, oauth)
+
+        const userDto = new GetUserDto(newUser)
+        const tokens = await this.tokenService.generateTokens({...userDto})
+        const refreshToken = await this.tokenService.saveToken(tokens.refreshToken)
+        
+        return tokens
+    }
 
     async signUp(signUpDto: SignUpDto){
         const user = await this.usersService.getUserByEmail(signUpDto.email)
         if(user){
+            if(user.oauth){
+            throw new HttpException('пользователь уже существует в '+user.oauth, HttpStatus.CONFLICT)
+            }
             throw new HttpException('пользователь уже существует', HttpStatus.CONFLICT)
         }
         const newUser = await this.usersService.create(signUpDto)
@@ -38,7 +64,7 @@ export class AuthService {
     }
 
     async signIn(signInDto: SignInDto, host: Host){
-        const user = await this.usersService.getUserByEmail(signInDto.email)
+        const user = await this.usersService.getOauthUserByEmail(signInDto.email)
         if(!user){
             throw new HttpException('пользователь не существует', HttpStatus.NOT_FOUND)
         }
@@ -65,6 +91,7 @@ export class AuthService {
 
     async refresh(user: GetUserDto, refreshToken: string, host: Host){
         await this.tokenService.deleteToken(refreshToken)
+        console.log(user)
         const findedUser = await this.usersService.getUserById(user.id)
         if(!findedUser){
             throw new HttpException('пользователь не найден!', HttpStatus.NOT_FOUND)
@@ -73,7 +100,7 @@ export class AuthService {
         const token = await this.tokenService.saveToken(tokens.refreshToken)
         
         await this.connectDevice(host, token, findedUser)
-        return tokens
+        return {...tokens, findedUser}
     }
 
     async logout(token: string){

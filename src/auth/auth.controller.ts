@@ -8,6 +8,7 @@ import { AuthService } from './auth.service';
 import { OauthDto } from './dtos/Oauth.dto';
 import { SignInDto } from './dtos/sign-in.dto';
 import { SignUpDto } from './dtos/sign-up.dto';
+import { Oauth } from './enums/oauth.enum';
 import { RefreshGuard } from './guards/rt.guard';
 
 @ApiTags('Authentication')
@@ -25,13 +26,37 @@ export class AuthController {
     return await this.authService.signUp(signUpDto)
   }
 
-  @Post('/oauth')
-  @ApiOperation({summary: 'oauth via other services'})
+  @Post('yandex')
+  // @UseGuards(AuthGuard('yandex'))
   async Oauth(
     @Body()
-    oauthDto: OauthDto
+    oauth: OauthDto,
+
+    @Res()
+    res: Response
+
   ){
-    return oauthDto
+
+    const oauthDto = await this.authService.Oauth(oauth, Oauth.YANDEX)
+    this.authService.setCookie(res, oauthDto.refreshToken)
+    return res.send()
+  }
+
+  @Get('/callback/yandex')
+  @ApiOperation({summary: 'oauth via other services'})
+  @UseGuards(AuthGuard('yandex'))
+  async OauthCallback(
+    @Req()
+    req: Request,
+
+    @Res()
+    res: Response
+
+  ){
+    const user = req.user
+    // const oauthDto = await this.authService.Oauth(user, Oauth.YANDEX)
+    // this.authService.setCookie(res, oauthDto.refreshToken)  
+    // return res.send()
   }
 
   @Post('sign-in')
@@ -67,9 +92,17 @@ export class AuthController {
     const user = new GetUserDto({...req.user})
     const token: string = req.cookies['refreshToken']
 
-    const tokens = await this.authService.refresh(user, token, host)
-    this.authService.setCookie(res, tokens.refreshToken)
-    return tokens.accessToken
+    const data = await this.authService.refresh(user, token, host)
+    this.authService.setCookie(res, data.refreshToken)
+    return {
+      token: data.accessToken,
+      user: {
+        id: data.findedUser.id,
+        email: data.findedUser.email,
+        img: data.findedUser.img,
+
+      }
+    }
   }
 
   @UseGuards(RefreshGuard)

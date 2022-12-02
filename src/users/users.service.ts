@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import * as argon2 from 'argon2'
 import { Oauth } from 'src/auth/enums/oauth.enum';
+import { OauthDto } from 'src/auth/dtos/Oauth.dto';
 @Injectable()
 export class UsersService {
     constructor(
@@ -17,9 +18,14 @@ export class UsersService {
         return await this.userRepository.save(encrypted)
     }
 
-    // async createOauth(oauth: Oauth){
-    //     return await this.userRepository.save()
-    // }
+    async createOauth(oauthUaer: OauthDto, oauth: Oauth){
+        const user = this.userRepository.create()
+        user.email = oauthUaer.email
+        user.img = oauthUaer.img
+        user.oauth = oauth
+        user.password = null
+        return await this.userRepository.save(user)
+    }
 
     async update(user: User){
         return await this.userRepository.save(user)
@@ -38,6 +44,13 @@ export class UsersService {
         return user
     }
 
+    async getOauthUserByEmail(email){
+        if(!email){
+            return null
+        }
+        const user = await this.userRepository.findOneBy({email: email, oauth: null})
+        return user
+    }
     async getUsers(){
         return await this.userRepository.find({
             relations: ['sessions']

@@ -16,6 +16,7 @@ import { TokensService } from 'src/tokens/tokens.service';
 import { TokensModule } from 'src/tokens/tokens.module';
 import { SessionsService } from 'src/sessions/sessions.service';
 import { SessionsModule } from 'src/sessions/sessions.module';
+import { YandexStrategy } from './strategies/yndex.strategy';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Token, UserSession]),
@@ -31,6 +32,7 @@ import { SessionsModule } from 'src/sessions/sessions.module';
     UsersService,
     RTStrategy, 
     ATStrategy,
+    YandexStrategy,
     RolesGuard,
     AccessGuard,
     TokensService,

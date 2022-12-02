@@ -16,7 +16,7 @@ export class User{
     @Column({nullable: true})
     password: string
 
-    @Column({default: null})
+    @Column({nullable: true, default: 'https://avatars.dzeninfra.ru/get-yapic/0/0-0/islands-small'})
     img: string
 
     @Column({default: Role.USER})
