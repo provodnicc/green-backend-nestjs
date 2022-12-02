@@ -26,7 +26,7 @@ export class AuthService {
         user.email = oauthUser.email
 
         
-        user.img = `https://avatars.yandex.net/get-yapic/${oauthUser.img}/islands-small`
+        user.img = `https://avatars.yandex.net/get-yapic/${oauthUser.img_id}/islands-small`
         
 
 

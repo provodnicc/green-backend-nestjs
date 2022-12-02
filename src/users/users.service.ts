@@ -18,7 +18,7 @@ export class UsersService {
         return await this.userRepository.save(encrypted)
     }
 
-    async createOauth(oauthUaer: OauthDto, oauth: Oauth){
+    async createOauth(oauthUaer: User, oauth: Oauth){
         const user = this.userRepository.create()
         user.email = oauthUaer.email
         user.img = oauthUaer.img

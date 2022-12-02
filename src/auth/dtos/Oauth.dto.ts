@@ -11,7 +11,7 @@ export class OauthDto{
     
     @ApiProperty({default: 'https://avatars.yandex.net/get-yapic/0/0-0/islands-small'})
     @IsString()
-    img: string
+    img_id: string
 
     // @ApiProperty({default: 'aaa'})
     // token: string
