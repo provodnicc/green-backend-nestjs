@@ -108,9 +108,9 @@ export class AuthService {
         await this.tokenService.deleteToken(token)
     }
 
-    getHostInfo(req: Request){
+    getHostInfo(req: Request, ip: any){
         const agent = req.headers['user-agent']
-        const hostName = req.headers['host']
+        const hostName = ip
         return {agent, hostName}
     }
     

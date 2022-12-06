@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Patch, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Patch, Post, Req, Res, UseGuards, Ip } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
@@ -53,6 +53,7 @@ export class AuthController {
     res: Response
 
   ){
+
     const user = req.user
     // const oauthDto = await this.authService.Oauth(user, Oauth.YANDEX)
     // this.authService.setCookie(res, oauthDto.refreshToken)  
@@ -62,6 +63,9 @@ export class AuthController {
   @Post('sign-in')
   @ApiOperation({summary: 'sign-in user'})
   async signIn(
+    @Ip()
+    IP: any,
+
     @Req()
     req: Request,
 
@@ -71,7 +75,7 @@ export class AuthController {
     @Res({passthrough: true })
     res: Response,
   ){
-    const host = this.authService.getHostInfo(req)
+    const host = this.authService.getHostInfo(req, IP)
     const context = await this.authService.signIn(signInDto, host)
 
     this.authService.setCookie(res, context.refreshToken)
@@ -82,13 +86,16 @@ export class AuthController {
   @Get('refresh')
   @ApiOperation({summary: 'refresh token pair by cookie'})
   async refresh(
+    @Ip()
+    IP: any,
     @Req()
     req: Request,
 
     @Res({passthrough: true})
     res: Response
   ){
-    const host: Host = this.authService.getHostInfo(req)
+    console.log(IP)
+    const host: Host = this.authService.getHostInfo(req, IP)
     const user = new GetUserDto({...req.user})
     const token: string = req.cookies['refreshToken']
 
