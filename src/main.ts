@@ -10,7 +10,7 @@ async function bootstrap() {
   const logger = new Logger('NestApplication')
 
   const config = new DocumentBuilder()
-  .setTitle('RuNotes')
+  .setTitle('Auth Service')
   .setDescription('there are notes description')
   .setVersion('1.0')
   .build();
