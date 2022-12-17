@@ -11,7 +11,7 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
   .setTitle('Auth Service')
-  .setDescription('there are notes description')
+  .setDescription('there are authentication and authorization service')
   .setVersion('1.0')
   .build();
   const document = SwaggerModule.createDocument(app, config);
