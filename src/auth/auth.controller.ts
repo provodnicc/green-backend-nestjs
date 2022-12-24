@@ -79,7 +79,9 @@ export class AuthController {
     const context = await this.authService.signIn(signInDto, host)
 
     this.authService.setCookie(res, context.refreshToken)
-    return context.accessToken
+    return {
+      token: context.accessToken
+    }
   }
   
   @UseGuards(RefreshGuard)
