@@ -10,8 +10,8 @@ async function bootstrap() {
   const logger = new Logger('NestApplication')
 
   const config = new DocumentBuilder()
-  .setTitle('RuNotes')
-  .setDescription('there are notes description')
+  .setTitle('Auth Service')
+  .setDescription('there are authentication and authorization service')
   .setVersion('1.0')
   .build();
   const document = SwaggerModule.createDocument(app, config);
